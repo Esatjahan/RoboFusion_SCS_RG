@@ -40,7 +40,7 @@ def create_reading(
     payload: SensorReadingCreate,
     db: Annotated[Session, Depends(get_db)],
 ) -> SensorReadingResponse:
-    """Validate the zone and store one sensor packet."""
+    """Validate the zone and store one sensor reading."""
 
     zone = get_zone_by_id(
         db,
@@ -50,19 +50,13 @@ def create_reading(
     if zone is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=(
-                f"Zone with ID {payload.zone_id} "
-                "was not found."
-            ),
+            detail=f"Zone with ID {payload.zone_id} was not found.",
         )
 
     if not zone.is_active:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=(
-                f"Zone with ID {payload.zone_id} "
-                "is currently inactive."
-            ),
+            detail=f"Zone with ID {payload.zone_id} is inactive.",
         )
 
     try:
@@ -76,7 +70,7 @@ def create_reading(
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to store the sensor reading.",
+            detail="Failed to store sensor reading.",
         ) from exc
 
 
@@ -84,10 +78,7 @@ def create_reading(
     "",
     response_model=list[SensorReadingResponse],
     summary="List sensor readings",
-    description=(
-        "Return stored sensor readings with optional "
-        "zone and device filters."
-    ),
+    description="Return stored sensor readings.",
 )
 def list_readings(
     db: Annotated[Session, Depends(get_db)],
@@ -106,30 +97,13 @@ def list_readings(
             description="Maximum records to return.",
         ),
     ] = 100,
-    zone_id: Annotated[
-        int | None,
-        Query(
-            gt=0,
-            description="Filter by zone ID.",
-        ),
-    ] = None,
-    device_id: Annotated[
-        str | None,
-        Query(
-            min_length=1,
-            max_length=100,
-            description="Filter by device ID.",
-        ),
-    ] = None,
 ) -> list[SensorReadingResponse]:
-    """Return stored sensor readings."""
+    """Return a paginated list of readings."""
 
     return get_sensor_readings(
         db,
         skip=skip,
         limit=limit,
-        zone_id=zone_id,
-        device_id=device_id,
     )
 
 
@@ -142,7 +116,7 @@ def read_sensor_reading(
     reading_id: int,
     db: Annotated[Session, Depends(get_db)],
 ) -> SensorReadingResponse:
-    """Return one reading or a 404 response."""
+    """Return one reading or raise a 404 response."""
 
     reading = get_sensor_reading_by_id(
         db,

@@ -16,7 +16,7 @@ from app.db.session import Base
 
 
 class SensorReading(Base):
-    """Store one sensor-data packet received from a zone node."""
+    """Store one sensor data packet."""
 
     __tablename__ = "sensor_readings"
 
