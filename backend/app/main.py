@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.api.v1.router import api_router
 from app.core.config import settings
 from app.db.session import engine
 
@@ -9,16 +10,27 @@ from app.db.session import engine
 app = FastAPI(
     title=settings.app_name,
     description=(
-        "Backend API for the Multi-Hazard Smart Campus "
+        "Backend API for the RoboFusion Smart Campus "
         "Safety and Response Grid."
     ),
     version=settings.app_version,
 )
 
 
-@app.get("/")
+app.include_router(
+    api_router,
+    prefix="/api/v1",
+)
+
+
+@app.get(
+    "/",
+    tags=["System"],
+    summary="API root",
+)
 def read_root() -> dict[str, str]:
     """Return basic information about the API."""
+
     return {
         "message": "RoboFusion SCS-RG API is running",
         "status": "online",
@@ -26,9 +38,14 @@ def read_root() -> dict[str, str]:
     }
 
 
-@app.get("/health")
+@app.get(
+    "/health",
+    tags=["System"],
+    summary="Backend health check",
+)
 def health_check() -> dict[str, str]:
     """Return the current health status of the backend."""
+
     return {
         "status": "healthy",
         "service": "backend",
@@ -36,9 +53,14 @@ def health_check() -> dict[str, str]:
     }
 
 
-@app.get("/health/database")
+@app.get(
+    "/health/database",
+    tags=["System"],
+    summary="Database health check",
+)
 def database_health_check() -> dict[str, str]:
     """Verify that the backend can connect to PostgreSQL."""
+
     try:
         with engine.connect() as connection:
             database_name = connection.execute(
