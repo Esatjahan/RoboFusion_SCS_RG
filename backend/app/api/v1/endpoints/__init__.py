@@ -1,3 +1,6 @@
-from app.api.v1.endpoints import zones
+from app.api.v1.endpoints import sensor_readings, zones
 
-__all__ = ["zones"]
+__all__ = [
+    "sensor_readings",
+    "zones",
+]
