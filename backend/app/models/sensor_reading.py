@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     Boolean,
@@ -10,9 +11,13 @@ from sqlalchemy import (
     String,
     func,
 )
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.session import Base
+
+
+if TYPE_CHECKING:
+    from app.models.risk_assessment import RiskAssessment
 
 
 class SensorReading(Base):
@@ -114,4 +119,11 @@ class SensorReading(Base):
         DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
+    )
+
+    risk_assessment: Mapped["RiskAssessment | None"] = relationship(
+        back_populates="sensor_reading",
+        cascade="all, delete-orphan",
+        uselist=False,
+        single_parent=True,
     )

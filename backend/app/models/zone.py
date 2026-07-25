@@ -1,9 +1,14 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, DateTime, Integer, String, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.session import Base
+
+
+if TYPE_CHECKING:
+    from app.models.risk_assessment import RiskAssessment
 
 
 class Zone(Base):
@@ -58,4 +63,10 @@ class Zone(Base):
         nullable=False,
         server_default=func.now(),
         onupdate=func.now(),
+    )
+
+    risk_assessments: Mapped[list["RiskAssessment"]] = relationship(
+        back_populates="zone",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )

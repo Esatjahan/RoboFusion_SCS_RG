@@ -11,6 +11,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
+from app.schemas.risk_assessment import (
+    SensorReadingWithRiskResponse,
+)
 from app.schemas.sensor_reading import (
     SensorReadingCreate,
     SensorReadingResponse,
@@ -28,19 +31,22 @@ router = APIRouter()
 
 @router.post(
     "",
-    response_model=SensorReadingResponse,
+    response_model=SensorReadingWithRiskResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Store a sensor reading",
+    summary="Store a sensor reading and calculate risk",
     description=(
         "Receive and store one validated sensor packet "
-        "from a Wokwi or ESP32 zone node."
+        "from a Wokwi or ESP32 zone node, then automatically "
+        "calculate and return its fused risk assessment."
     ),
 )
 def create_reading(
     payload: SensorReadingCreate,
     db: Annotated[Session, Depends(get_db)],
-) -> SensorReadingResponse:
-    """Validate the zone and store one sensor reading."""
+) -> SensorReadingWithRiskResponse:
+    """
+    Store one sensor reading and return its risk assessment.
+    """
 
     zone = get_zone_by_id(
         db,
@@ -60,9 +66,21 @@ def create_reading(
         )
 
     try:
-        return create_sensor_reading(
+        sensor_reading = create_sensor_reading(
             db,
             payload,
+        )
+
+        risk_assessment = sensor_reading.risk_assessment
+
+        if risk_assessment is None:
+            raise RuntimeError(
+                "Risk assessment was not generated for the sensor reading."
+            )
+
+        return SensorReadingWithRiskResponse(
+            sensor_reading=sensor_reading,
+            risk=risk_assessment,
         )
 
     except SQLAlchemyError as exc:
@@ -70,7 +88,18 @@ def create_reading(
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to store sensor reading.",
+            detail=(
+                "Failed to store the sensor reading "
+                "and risk assessment."
+            ),
+        ) from exc
+
+    except RuntimeError as exc:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(exc),
         ) from exc
 
 
