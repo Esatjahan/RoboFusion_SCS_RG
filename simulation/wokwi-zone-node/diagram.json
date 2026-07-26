@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "author": "Esat Jahan Akhi",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-breadboard-half",
+      "id": "bb1",
+      "top": 24.9,
+      "left": -294.3,
+      "rotate": 90,
+      "attrs": { "color": "#eeefed" }
+    },
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 19.2, "left": 110.44, "attrs": {} },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": 159.8,
+      "left": 259.2,
+      "attrs": { "color": "green", "xray": "1" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn2",
+      "top": 73.4,
+      "left": 259.2,
+      "attrs": { "color": "green", "xray": "1" }
+    },
+    { "type": "wokwi-dht22", "id": "dht1", "top": -86.1, "left": 263.4, "attrs": {} },
+    { "type": "wokwi-potentiometer", "id": "pot1", "top": -68.5, "left": -0.2, "attrs": {} },
+    { "type": "wokwi-potentiometer", "id": "pot2", "top": 37.1, "left": -0.2, "attrs": {} },
+    { "type": "wokwi-potentiometer", "id": "pot3", "top": 133.1, "left": -0.2, "attrs": {} },
+    { "type": "wokwi-potentiometer", "id": "pot4", "top": 229.1, "left": -0.2, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "esp:GND.2", "bb1:tn.1", "blue", [ "v0", "h0", "v-134.4", "h-268.8" ] ],
+    [ "esp:3V3", "bb1:tp.1", "red", [ "h0.15", "v-144", "h-153.6" ] ],
+    [ "pot1:GND", "bb1:tn.2", "blue", [ "v19.2", "h-48", "v-76.8", "h-38.4", "v67.2" ] ],
+    [ "pot1:VCC", "bb1:tp.2", "red", [ "v28.8", "h-77.6", "v-19.2", "h-9.6" ] ],
+    [ "pot2:GND", "bb1:tn.11", "blue", [ "v9.6", "h-76.8" ] ],
+    [ "pot2:VCC", "bb1:tp.11", "red", [ "v19.2", "h-0.8" ] ],
+    [ "pot3:GND", "bb1:tn.16", "blue", [ "v9.6", "h-48", "v-48", "h-28.8" ] ],
+    [ "pot3:VCC", "bb1:tp.20", "red", [ "v19.2", "h-0.8" ] ],
+    [ "pot4:GND", "bb1:tn.25", "blue", [ "v28.8", "h-76.8" ] ],
+    [ "pot4:VCC", "bb1:tp.25", "red", [ "v48", "h-87.2" ] ],
+    [ "btn2:1.l", "bb1:tn.24", "blue", [ "h-28.8", "v268.8", "h-288", "v-96" ] ],
+    [ "btn1:1.l", "bb1:tn.23", "blue", [ "h-19.2", "v192", "h-316.8", "v-115.2", "h9.6" ] ],
+    [ "dht1:VCC", "bb1:tp.4", "red", [ "v0", "h-57.6", "v-134.4", "h-288", "v144" ] ],
+    [ "dht1:GND", "bb1:tn.3", "blue", [ "v19.2", "h28.8", "v-163.2", "h-345.6", "v124.8" ] ],
+    [ "esp:15", "dht1:SDA", "green", [ "v0", "h9.6", "v-144", "h57.6" ] ],
+    [ "esp:34", "pot1:SIG", "green", [ "h-28.65", "v-57.6", "h0", "v-9.6", "h-48" ] ],
+    [ "esp:35", "pot2:SIG", "green", [ "h-28.65", "v19.2", "h-48" ] ],
+    [ "esp:32", "pot3:SIG", "green", [ "h-19.05", "v105.6", "h-57.6" ] ],
+    [ "esp:33", "pot4:SIG", "green", [ "h-9.45", "v201.6", "h-67.2", "v-28.8" ] ],
+    [ "btn2:2.l", "esp:25", "green", [ "h-9.6", "v153.8", "h-163.2", "v-134.4" ] ],
+    [ "btn1:2.l", "esp:26", "green", [ "h0", "v86.6", "h-182.4", "v-144" ] ]
+  ],
+  "dependencies": {}
+}
